@@ -16,6 +16,7 @@
         <th>Username</th>
         <th>Age</th>
         <th>Email</th>
+        <th>Roles</th>
         <th>Action</th>
     </tr>
     <tr th:each="user : ${users}">
@@ -24,6 +25,7 @@
         <td th:text="${user.getUsername()}"></td>
         <td th:text="${user.getAge()}"></td>
         <td th:text="${user.email}"></td>
+        <td th:text="${user.getRoles()}"></td>
         <td><a th:href="@{'/admin/edit?userId=' + ${user.getId()}}">Edit</a>
             <a th:href="@{'/admin/delete?userId=' + ${user.getId()}}">Delete</a>
             <a th:method="POST" th:action="@{'/admin/delete?userId=' + ${user.getId()}}" th:object="${user}"></a></td>
