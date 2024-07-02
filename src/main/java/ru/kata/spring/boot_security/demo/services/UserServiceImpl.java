@@ -32,10 +32,6 @@ public class UserServiceImpl implements UserService {
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    public static void main(String[] args) {
-        BCryptPasswordEncoder bCryptPasswordEncoder1 = new BCryptPasswordEncoder();
-        System.out.println(bCryptPasswordEncoder1.encode("admin"));
-    }
 
     @Transactional
     public void save(User user, Set<String> roles) {
