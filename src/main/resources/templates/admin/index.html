@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Users</title>
+</head>
+<body>
+<div align="center"> ...</div>
+<h2>Users </h2>
+
+<h3><a href="admin/new">Create new User</a></h3>
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Username</th>
+        <th>Age</th>
+        <th>Email</th>
+        <th>Action</th>
+    </tr>
+    <tr th:each="user : ${users}">
+        <td><a th:href="@{/admin/user(userId=${user.getId()})}" th:utext="${user.getId()}">...</a></td>
+        <td><a th:href="@{/admin/user(userId=${user.getId()})}" th:utext="${user.getName()}">...</a></td>
+        <td th:text="${user.getUsername()}"></td>
+        <td th:text="${user.getAge()}"></td>
+        <td th:text="${user.email}"></td>
+        <td><a th:href="@{'/admin/edit?userId=' + ${user.getId()}}">Edit</a>
+            <a th:href="@{'/admin/delete?userId=' + ${user.getId()}}">Delete</a>
+            <a th:method="POST" th:action="@{'/admin/delete?userId=' + ${user.getId()}}" th:object="${user}"></a></td>
+    </tr>
+</table>
+
+<br/>
+<form th:action="@{'/logout'}">
+    <input type="submit" value="Logout"/>
+</form>
+
+</body>
+</html>
