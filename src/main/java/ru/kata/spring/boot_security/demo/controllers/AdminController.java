@@ -69,16 +69,11 @@ public class AdminController {
     @PatchMapping("/edit")
     public String editUser(@RequestParam(name = "userId") int userId,
                            @ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
-        bindingResult.getAllErrors().forEach(System.err::println);
         userValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors()) {
             return "admin/edit";
         }
-        try {
-            userService.update(user);
-        } catch (Exception e) {
-            bindingResult.addError(new ObjectError("email", "An account already exists for this username"));
-        }
+        userService.update(user);
         return "redirect:/admin";
     }
 
