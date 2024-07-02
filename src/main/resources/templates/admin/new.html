@@ -30,7 +30,17 @@
     <input type="password" th:field="*{password}" id="password"/>
     <div style="color: red" th:if="${#fields.hasErrors('password')}" th:errors="*{password}">Password error</div>
 
+    <br/>
+    <br/>
+    <label>
+        <select size="3" multiple="multiple" th:name="userRoles" id="userRoles">
+            <option disabled>Roles:</option>
+            <option th:value="2">ADMIN</option>
+            <option selected th:value="1">USER</option>
+        </select>
+    </label>
 
+    <br/>
     <br/>
     <input type="submit" value="Create!"/>
 </form>

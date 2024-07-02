@@ -5,12 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.services.UserService;
 import ru.kata.spring.boot_security.demo.util.UserValidator;
 
 import javax.validation.Valid;
+import java.util.Set;
 
 
 @Controller
@@ -20,8 +22,8 @@ public class AdminController {
     private final UserService userService;
     private final UserValidator userValidator;
 
-   @Autowired
-   public AdminController(UserService userService, UserValidator userValidator) {
+    @Autowired
+    public AdminController(UserService userService, UserValidator userValidator) {
         this.userService = userService;
         this.userValidator = userValidator;
     }
@@ -41,11 +43,12 @@ public class AdminController {
 
     @PostMapping("/new")
     public String create(@ModelAttribute("user") @Valid User user,
-                         BindingResult bindingResult) {
+                         BindingResult bindingResult, @RequestParam(value = "userRoles", required = false) Set<String> role) {
+        System.out.println(role);
         userValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors())
             return "admin/new";
-        userService.save(user);
+        userService.save(user, role);
         return "redirect:/admin";
     }
 
@@ -66,12 +69,16 @@ public class AdminController {
     @PatchMapping("/edit")
     public String editUser(@RequestParam(name = "userId") int userId,
                            @ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
-//         userValidator.validate(user, bindingResult); эта строка кода не дает менять поля без изменения email, пока не придумал как пофиксить
+        bindingResult.getAllErrors().forEach(System.err::println);
+        userValidator.validate(user, bindingResult);
         if (bindingResult.hasErrors()) {
-//            System.out.println(bindingResult); Не меняются поля, т.к юзернейм не уникальный
             return "admin/edit";
         }
-        userService.save(user);
+        try {
+            userService.update(user);
+        } catch (Exception e) {
+            bindingResult.addError(new ObjectError("email", "An account already exists for this username"));
+        }
         return "redirect:/admin";
     }
 

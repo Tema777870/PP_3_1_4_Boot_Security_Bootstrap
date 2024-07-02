@@ -1,7 +1,7 @@
 package ru.kata.spring.boot_security.demo.services;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -12,47 +12,63 @@ import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Service
-//@RequiredArgsConstructor
 
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
-//    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 
-    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository) {
+    @Autowired
+    public UserServiceImpl(UserRepository userRepository, RoleRepository roleRepository, @Lazy BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-//   @Autowired
-//   public void setbCryptPasswordEncoder(BCryptPasswordEncoder bCryptPasswordEncoder) {
-//        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-//    }
+    public static void main(String[] args) {
+        BCryptPasswordEncoder bCryptPasswordEncoder1 = new BCryptPasswordEncoder();
+        System.out.println(bCryptPasswordEncoder1.encode("admin"));
+    }
 
     @Transactional
-    public boolean save(User user) {
-        User userFromDB = userRepository.findByUsername(user.getUsername());
-        if (userFromDB != null) {
-            userFromDB.setName(user.getName());
-            userFromDB.setAge(user.getAge());
-            userFromDB.setEmail(user.getEmail());
-            userFromDB.setUsername(user.getUsername());
-            userFromDB.setPassword(user.getPassword());
-            userRepository.saveAndFlush(userFromDB);
-            return true;
-        }
-        user.setRoles(Collections.singleton(new Role(1, "ROLE_USER")));
-//        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+    public void save(User user, Set<String> roles) {
+        user.setRoles(getUserRoles(roles));
+        user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userRepository.save(user);
-        return true;
     }
+
+    @Transactional
+    public void update(User user) {
+        User userFromDB = userRepository.findById(user.getId()).get();
+
+        String password = userFromDB.getPassword();
+        Set<Role> roles = userFromDB.getRoles();
+        user.setRoles(roles);
+
+        if (!password.equals(user.getPassword())) {
+            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        }
+        userRepository.save(user);
+    }
+
+    private Set<Role> getUserRoles(Set<String> roles) {
+        if (roles.isEmpty()) {
+            roles.add("1");
+        }
+        Set<Integer> roleIds = roles.stream()
+                .map(Integer::parseInt)
+                .collect(Collectors.toSet());
+        return new HashSet<>(roleRepository.findAllById(roleIds));
+
+    }
+
 
     public List<User> listAll() {
 
@@ -70,17 +86,23 @@ public class UserServiceImpl implements UserService {
         userRepository.deleteById(id);
     }
 
-    public User findByEmail(String email) {
+    public Optional<User> findByEmail(String email) {
+        User user = userRepository.findByEmail(email);
+        return user == null ? Optional.empty() : Optional.of(user);
+    }
 
-        return userRepository.findByEmail(email);
+    public Optional<User> findByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        return user == null ? Optional.empty() : Optional.of(user);
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
-      if (user == null) {
-          throw new UsernameNotFoundException("User not found");
-      }
-      return user;
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+        return user;
     }
+
 }

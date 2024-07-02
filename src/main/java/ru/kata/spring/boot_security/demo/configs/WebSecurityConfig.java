@@ -7,8 +7,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import ru.kata.spring.boot_security.demo.services.UserService;
 
 @Configuration
@@ -18,9 +17,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserService userService;
 
 
-
-   @Autowired
-   public WebSecurityConfig(SuccessUserHandler successUserHandler, UserService userService) {
+    @Autowired
+    public WebSecurityConfig(SuccessUserHandler successUserHandler, UserService userService) {
         this.successUserHandler = successUserHandler;
         this.userService = userService;
     }
@@ -49,9 +47,15 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userService);
     }
-    @Bean
-    public PasswordEncoder getPasswordEncoder() {
+//    @Bean
+//    public PasswordEncoder getPasswordEncoder() {
+//
+//       return NoOpPasswordEncoder.getInstance();
+//    }
 
-       return NoOpPasswordEncoder.getInstance();
+    @Bean
+    public BCryptPasswordEncoder getPasswordEncoder() {
+
+        return new BCryptPasswordEncoder();
     }
 }
