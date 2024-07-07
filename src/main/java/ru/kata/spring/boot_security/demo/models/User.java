@@ -1,6 +1,8 @@
 package ru.kata.spring.boot_security.demo.models;
 
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -34,14 +36,19 @@ public class User implements UserDetails {
     @NotEmpty(message = "Email should not be empty")
     @Email(message = "Email should be valid")
     private String email;
-    @Column(name = "username", unique = true)
-    @NotEmpty(message = "Username should not be empty")
-    private String username;
+    @Column(name = "last_name")
+    @NotEmpty(message = "Last name should not be empty")
+    private String lastName;
     @Column(name = "password")
     @NotEmpty(message = "Password should not be empty")
     private String password;
 
+
     @ManyToMany(fetch = FetchType.LAZY)
+    @Fetch(FetchMode.JOIN)
+//    @JoinTable(name = "users_roles",
+//            joinColumns = @JoinColumn(name = "user_id"),
+//            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
     public User() {
@@ -89,12 +96,12 @@ public class User implements UserDetails {
     }
 
 
-    public String getUsername() {
-        return username;
+    public String getLastName() {
+        return lastName;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 
     public String getPassword() {
@@ -103,6 +110,15 @@ public class User implements UserDetails {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    @Override
+    public String getUsername() {
+        return getEmail();
+    }
+
+    public void setUsername(String email) {
+        this.email = email;
     }
 
     @Override

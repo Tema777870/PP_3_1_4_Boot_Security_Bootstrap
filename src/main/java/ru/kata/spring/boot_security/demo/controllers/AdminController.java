@@ -11,6 +11,7 @@ import ru.kata.spring.boot_security.demo.services.UserService;
 import ru.kata.spring.boot_security.demo.util.UserValidator;
 
 import javax.validation.Valid;
+import java.security.Principal;
 import java.util.Set;
 
 
@@ -29,7 +30,12 @@ public class AdminController {
 
 
     @GetMapping
-    public String home(Model model) {
+    public String home(Model model, Principal principal) {
+        User user = userService.findByUsername(principal.getName()).get();
+//        System.out.println(principal.getName());
+//        System.out.println("try to get email");
+//        System.out.println(user.getEmail());
+        model.addAttribute("user", user);
         model.addAttribute("users", userService.listAll());
         return "admin/index";
     }

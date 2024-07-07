@@ -30,15 +30,16 @@ public class UserValidator implements Validator {
     public void validate(Object target, Errors errors) {
         User user = (User) target;
         Optional<User> byEmail = userService.findByEmail(user.getEmail());
-        Optional<User> byUsername = userService.findByUsername(user.getUsername());
+     //   Optional<User> byUsername = userService.findByUsername(user.getUsername());
         if (user.getId() == 0) {
-            validateUsername(byUsername, errors);
+          //  validateUsername(byUsername, errors);
             validateEmail(byEmail, errors);
         } else if (byEmail.isPresent() && byEmail.get().getId() != user.getId()) {
             validateEmail(byEmail, errors);
-        } else if (byUsername.isPresent() && byUsername.get().getId() != user.getId()) {
-            validateUsername(byUsername, errors);
         }
+//        } else if (byUsername.isPresent() && byUsername.get().getId() != user.getId()) {
+//            validateUsername(byUsername, errors);
+//        }
     }
 
     private void validateEmail(Optional<User> user, Errors errors) {
@@ -47,9 +48,9 @@ public class UserValidator implements Validator {
         }
     }
 
-    private void validateUsername(Optional<User> user, Errors errors) {
-        if (user.isPresent()) {
-            errors.rejectValue("username", "", "This username is already taken");
-        }
-    }
+//    private void validateUsername(Optional<User> user, Errors errors) {
+//        if (user.isPresent()) {
+//            errors.rejectValue("username", "", "This username is already taken");
+//        }
+//    }
 }

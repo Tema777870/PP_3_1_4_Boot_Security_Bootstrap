@@ -35,6 +35,11 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public void save(User user, Set<String> roles) {
+        if(roles == null) {
+            roles = new HashSet<>();
+            roles.add("1");
+            user.setRoles(getUserRoles(roles));
+        }
         user.setRoles(getUserRoles(roles));
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         userRepository.save(user);
@@ -88,13 +93,13 @@ public class UserServiceImpl implements UserService {
     }
 
     public Optional<User> findByUsername(String username) {
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByEmail(username); // поменял нейм на почту
         return user == null ? Optional.empty() : Optional.of(user);
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username);
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(email);
         if (user == null) {
             throw new UsernameNotFoundException("User not found");
         }
