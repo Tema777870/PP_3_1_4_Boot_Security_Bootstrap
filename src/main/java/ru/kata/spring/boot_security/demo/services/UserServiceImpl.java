@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public void save(User user) {
-        Optional<User> userFromDB = userRepository.findById(user.getId());
+        //  Optional<User> userFromDB = Optional.ofNullable(userRepository.findByEmail(user.getEmail()));
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
         user.addRole(roleRepository.getById(1));
         userRepository.save(user);

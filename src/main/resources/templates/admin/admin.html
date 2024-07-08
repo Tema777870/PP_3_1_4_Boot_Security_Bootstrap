@@ -119,38 +119,34 @@
 
                                     <label for="First name" class="form-label"><b>First name</b></label>
                                     <input type="text" class="form-control w-25 row-cols-5" style="margin: auto"
-                                           id="First name" placeholder="First name" th:field="*{name}">
-                                    <div style="color: red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">
-                                        Name error
-                                    </div>
+                                           id="First name" placeholder="First name" th:field="*{name}"
+                                           minlength="2" maxlength="40" required/>
+
 
                                     <label for="Last name" class="form-label"><b>Last name</b></label>
                                     <input type="text" class="form-control w-25 row-cols-5" style="margin: auto"
-                                           id="Last name" placeholder="Last name" th:field="*{lastName}">
-                                    <div style="color: red" th:if="${#fields.hasErrors('lastName')}"
-                                         th:errors="*{lastName}">Name error
-                                    </div>
+                                           id="Last name" placeholder="Last name" th:field="*{lastName}"
+                                           minlength="2" maxlength="40" required/>
+
                                     <br>
 
                                     <label for="password" class="form-label"><b>Password</b></label>
                                     <input type="text" class="form-control w-25 row-cols-5" style="margin: auto"
-                                           id="password" placeholder="password" th:field="*{password}">
+                                           id="password" placeholder="password" th:field="*{password}"
+                                           minlength="2"  required/>
                                     <br>
 
                                     <label for="age" class="form-label"><b>Age</b></label>
-                                    <input type="text" class="form-control w-25 row-cols-5" style="margin: auto"
-                                           id="age" placeholder="Age" th:field="*{age}">
-                                    <div style="color: red" th:if="${#fields.hasErrors('age')}" th:errors="*{age}">Age
-                                        error
-                                    </div>
+                                    <input type="number" class="form-control w-25 row-cols-5" style="margin: auto"
+                                           id="age" placeholder="Age" th:field="*{age}"
+                                    min="0" max="120" required/>
+
                                     <br>
 
                                     <label for="email" class="form-label"><b>Email</b></label>
                                     <input type="email" class="form-control w-25" style="margin: auto"
                                            id="email" placeholder="name@example.com" th:field="*{email}">
-                                    <div style="color: red" th:if="${#fields.hasErrors('email')}" th:errors="*{email}">
-                                        Email error
-                                    </div>
+
                                     <br/>
 
                                     <label for="roles"><b>Roles</b></label>
@@ -235,17 +231,20 @@
                         <label for="First name 1" class="form-label"><b>First name</b></label>
                         <input type="text" class="form-control w-50 row-cols-5" style="margin: auto"
                                id="First name 1" placeholder="First name "
-                               th:field="*{users[__${itemStat.index}__].name}">
+                               th:field="*{users[__${itemStat.index}__].name}"
+                               minlength="2" maxlength="40" required/>
 
                         <label for="Last name 1" class="form-label"><b>Last name</b></label>
                         <input type="text" class="form-control w-50 row-cols-5" style="margin: auto"
                                id="Last name 1" placeholder="Last name "
-                               th:field="*{users[__${itemStat.index}__].lastName}">
+                               th:field="*{users[__${itemStat.index}__].lastName}"
+                               minlength="2" maxlength="40" required/>
 
                         <label for="Age 1" class="form-label"><b>Age</b></label>
-                        <input type="text" class="form-control w-50 row-cols-5" style="margin: auto"
+                        <input type="number" class="form-control w-50 row-cols-5" style="margin: auto"
                                id="Age 1" placeholder="Age "
-                               th:field="*{users[__${itemStat.index}__].age}">
+                               th:field="*{users[__${itemStat.index}__].age}"
+                               min="0" max="120" required/>
                         <br/>
                         <label for="email1" class="form-label"><b>Email</b></label>
                         <input type="email" class="form-control w-50" style="margin: auto"
@@ -255,7 +254,8 @@
                         <label for="password1" class="form-label"><b>Password</b></label>
                         <input type="text" class="form-control w-50 row-cols-5" style="margin: auto"
                                id="password1" placeholder="password"
-                               th:field="*{users[__${itemStat.index}__].password}">
+                               th:field="*{users[__${itemStat.index}__].password}"
+                               minlength="2" required/>>
                         <br>
                         <br/>
 
