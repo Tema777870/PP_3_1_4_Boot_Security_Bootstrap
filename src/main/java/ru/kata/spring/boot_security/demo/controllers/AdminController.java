@@ -4,95 +4,56 @@ package ru.kata.spring.boot_security.demo.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.models.User;
+import ru.kata.spring.boot_security.demo.models.UserEditDTO;
+import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 import ru.kata.spring.boot_security.demo.services.UserService;
-import ru.kata.spring.boot_security.demo.util.UserValidator;
 
-import javax.validation.Valid;
 import java.security.Principal;
-import java.util.Set;
 
 
 @Controller
-@RequestMapping("/admin")
 public class AdminController {
 
     private final UserService userService;
-    private final UserValidator userValidator;
+    private final RoleRepository roleRepo;
 
     @Autowired
-    public AdminController(UserService userService, UserValidator userValidator) {
+    public AdminController(UserService userService, RoleRepository roleRepo) {
         this.userService = userService;
-        this.userValidator = userValidator;
+        this.roleRepo = roleRepo;
     }
 
 
-    @GetMapping
+    @GetMapping("/admin")
     public String home(Model model, Principal principal) {
         User user = userService.findByUsername(principal.getName()).get();
-//        System.out.println(principal.getName());
-//        System.out.println("try to get email");
-//        System.out.println(user.getEmail());
         model.addAttribute("user", user);
         model.addAttribute("users", userService.listAll());
-        return "admin/index";
+        model.addAttribute("roles", roleRepo.findAll());
+        model.addAttribute("new_user", new User());
+        model.addAttribute("usersForm", new UserEditDTO(userService.listAll()));
+        return "admin/admin";
     }
 
-    @GetMapping("/new")
-    public String newCustomerForm(Model model) {
-        model.addAttribute("user", new User());
-        return "admin/new";
+
+    @RequestMapping(value = {"/admin/new", "/admin/admin/new"}, method = RequestMethod.POST)
+    public String createUser(@ModelAttribute("user") User user) {
+        userService.save(user);
+        return "redirect:/admin/";
     }
 
-    @PostMapping("/new")
-    public String create(@ModelAttribute("user") @Valid User user,
-                         BindingResult bindingResult, @RequestParam(value = "userRoles", required = false) Set<String> role) {
-        System.out.println(role);
-        userValidator.validate(user, bindingResult);
-        if (bindingResult.hasErrors())
-            return "admin/new";
-        userService.save(user, role);
-        return "redirect:/admin";
+    @RequestMapping(value = {"/admin/edit", "/admin/admin/edit"}, method = RequestMethod.POST)
+    public String editUser(Model model, @ModelAttribute UserEditDTO userEditDTO) {
+        userService.saveAllUsers(userEditDTO.getUsers());
+        model.addAttribute("roles", roleRepo.findAll());
+        return "redirect:/admin/";
     }
 
-    @GetMapping("/user")
-    public String showUser(@RequestParam(name = "userId") int userId, Model model) {
-        User user = userService.get(userId);
-        model.addAttribute("user", user);
-        return "admin/show";
-    }
-
-    @GetMapping("/edit")
-    public String showEditUser(@RequestParam(name = "userId") int userId, Model model) {
-        User user = userService.get(userId);
-        model.addAttribute("user", user);
-        return "admin/edit";
-    }
-
-    @PatchMapping("/edit")
-    public String editUser(@RequestParam(name = "userId") int userId,
-                           @ModelAttribute("user") @Valid User user, BindingResult bindingResult) {
-        userValidator.validate(user, bindingResult);
-        if (bindingResult.hasErrors()) {
-            return "admin/edit";
-        }
-        userService.update(user);
-        return "redirect:/admin";
-    }
-
-    @GetMapping("/delete")
-    public String deleteUserPage(@RequestParam(name = "userId") int userId,
-                                 Model model) {
-        User user = userService.get(userId);
-        model.addAttribute("user", user);
-        return "admin/delete";
-    }
-
-    @DeleteMapping("/delete")
-    public String deleteUser(@RequestParam(name = "userId") int userId, @ModelAttribute("user") User user) {
-        userService.delete(userId);
-        return "redirect:/admin";
+    @RequestMapping(value = {"/admin/delete", "/admin/admin/delete"}, method = RequestMethod.POST)
+    public String removeUser(@ModelAttribute UserEditDTO userEditDTO) {
+        userService.deleteAllUsers(userEditDTO.getUsers());
+        return "redirect:/admin/";
     }
 }

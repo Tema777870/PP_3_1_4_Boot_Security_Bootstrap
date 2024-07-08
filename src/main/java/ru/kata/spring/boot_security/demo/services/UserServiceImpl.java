@@ -12,8 +12,9 @@ import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 
 @Service
@@ -34,21 +35,16 @@ public class UserServiceImpl implements UserService {
 
 
     @Transactional
-    public void save(User user, Set<String> roles) {
-        if(roles == null) {
-            roles = new HashSet<>();
-            roles.add("1");
-            user.setRoles(getUserRoles(roles));
-        }
-        user.setRoles(getUserRoles(roles));
+    public void save(User user) {
+        Optional<User> userFromDB = userRepository.findById(user.getId());
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        user.addRole(roleRepository.getById(1));
         userRepository.save(user);
     }
 
     @Transactional
     public void update(User user) {
         User userFromDB = userRepository.findById(user.getId()).get();
-
         String password = userFromDB.getPassword();
         Set<Role> roles = userFromDB.getRoles();
         user.setRoles(roles);
@@ -59,21 +55,10 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    private Set<Role> getUserRoles(Set<String> roles) {
-        if (roles.isEmpty()) {
-            roles.add("1");
-        }
-        Set<Integer> roleIds = roles.stream()
-                .map(Integer::parseInt)
-                .collect(Collectors.toSet());
-        return new HashSet<>(roleRepository.findAllById(roleIds));
-
-    }
-
 
     public List<User> listAll() {
 
-        return (List<User>) userRepository.findAll();
+        return userRepository.findAll();
     }
 
     public User get(int id) {
@@ -93,7 +78,7 @@ public class UserServiceImpl implements UserService {
     }
 
     public Optional<User> findByUsername(String username) {
-        User user = userRepository.findByEmail(username); // поменял нейм на почту
+        User user = userRepository.findByEmail(username);
         return user == null ? Optional.empty() : Optional.of(user);
     }
 
@@ -105,5 +90,14 @@ public class UserServiceImpl implements UserService {
         }
         return user;
     }
+
+    public void saveAllUsers(List<User> users) {
+        userRepository.saveAll(users);
+    }
+
+    public void deleteAllUsers(List<User> users) {
+        userRepository.deleteAll(users);
+    }
+
 
 }

@@ -128,7 +128,21 @@ public class User implements UserDetails {
     }
 
     public Set<Role> getRoles() {
+
         return roles;
+    }
+
+    public String getRolesNames() {
+        if (roles.size() == 2) {
+            return ("User, Admin");
+        } else if (roles.toString().contains("USER")) {
+            return ("User");
+        } else
+            return ("Admin");
+    }
+
+    public void addRole(Role role) {
+        this.roles.add(role);
     }
 
     public void setRoles(Set<Role> roles) {
@@ -156,5 +170,17 @@ public class User implements UserDetails {
     public boolean isEnabled() {
 
         return true;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", age=" + age +
+                ", email='" + email + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", roles=" + roles +
+                '}';
     }
 }

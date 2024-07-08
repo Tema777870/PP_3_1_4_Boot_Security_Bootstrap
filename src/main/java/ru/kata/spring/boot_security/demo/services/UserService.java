@@ -6,11 +6,10 @@ import ru.kata.spring.boot_security.demo.models.User;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 public interface UserService extends UserDetailsService {
 
-    void save(User user, Set<String> roles);
+    void save(User user);
 
     void update(User user);
 
@@ -23,4 +22,8 @@ public interface UserService extends UserDetailsService {
     Optional<User> findByEmail(String email);
 
     Optional<User> findByUsername(String username);
+
+    void saveAllUsers(List<User> users);
+
+    void deleteAllUsers(List<User> users);
 }
