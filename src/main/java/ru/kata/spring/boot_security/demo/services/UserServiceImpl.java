@@ -92,7 +92,13 @@ public class UserServiceImpl implements UserService {
     }
 
     public void saveAllUsers(List<User> users) {
+        for (User user : users) {
+            if (user.getPassword().length() != 60) {
+                user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            }
+        }
         userRepository.saveAll(users);
+
     }
 
     public void deleteAllUsers(List<User> users) {
