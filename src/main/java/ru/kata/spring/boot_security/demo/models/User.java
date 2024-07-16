@@ -37,6 +37,7 @@ public class User implements UserDetails {
     @Email(message = "Email should be valid")
     private String email;
     @Column(name = "last_name")
+    @Size(min = 2, max = 45, message = "Name should be between 2 and 45 characters")
     @NotEmpty(message = "Last name should not be empty")
     private String lastName;
     @Column(name = "password")
@@ -46,9 +47,6 @@ public class User implements UserDetails {
 
     @ManyToMany(fetch = FetchType.LAZY)
     @Fetch(FetchMode.JOIN)
-//    @JoinTable(name = "users_roles",
-//            joinColumns = @JoinColumn(name = "user_id"),
-//            inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles;
 
     public User() {
@@ -64,14 +62,17 @@ public class User implements UserDetails {
     }
 
     public int getId() {
+
         return id;
     }
 
     public void setId(int id) {
+
         this.id = id;
     }
 
     public String getName() {
+
         return name;
     }
 
@@ -80,44 +81,54 @@ public class User implements UserDetails {
     }
 
     public int getAge() {
+
         return age;
     }
 
     public void setAge(int age) {
+
         this.age = age;
     }
 
     public String getEmail() {
+
         return email;
     }
 
     public void setEmail(String email) {
+
         this.email = email;
     }
 
 
     public String getLastName() {
+
         return lastName;
     }
 
     public void setLastName(String lastName) {
+
         this.lastName = lastName;
     }
 
     public String getPassword() {
+
         return password;
     }
 
     public void setPassword(String password) {
+
         this.password = password;
     }
 
     @Override
     public String getUsername() {
+
         return getEmail();
     }
 
     public void setUsername(String email) {
+
         this.email = email;
     }
 
@@ -142,10 +153,12 @@ public class User implements UserDetails {
     }
 
     public void addRole(Role role) {
+
         this.roles.add(role);
     }
 
     public void setRoles(Set<Role> roles) {
+
         this.roles = roles;
     }
 

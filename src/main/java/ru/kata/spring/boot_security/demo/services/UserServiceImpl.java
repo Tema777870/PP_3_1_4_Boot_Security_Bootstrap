@@ -7,14 +7,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.kata.spring.boot_security.demo.models.Role;
 import ru.kata.spring.boot_security.demo.models.User;
 import ru.kata.spring.boot_security.demo.repositories.RoleRepository;
 import ru.kata.spring.boot_security.demo.repositories.UserRepository;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 
 @Service
@@ -36,9 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     public void save(User user) {
-        //  Optional<User> userFromDB = Optional.ofNullable(userRepository.findByEmail(user.getEmail()));
         user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-        user.addRole(roleRepository.getById(1));
         userRepository.save(user);
     }
 
@@ -46,8 +43,6 @@ public class UserServiceImpl implements UserService {
     public void update(User user) {
         User userFromDB = userRepository.findById(user.getId()).get();
         String password = userFromDB.getPassword();
-        Set<Role> roles = userFromDB.getRoles();
-        user.setRoles(roles);
 
         if (!password.equals(user.getPassword())) {
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
@@ -61,14 +56,16 @@ public class UserServiceImpl implements UserService {
         return userRepository.findAll();
     }
 
-    public User get(int id) {
+    public User getOneUser(int id) {
 
-        return userRepository.findById(id).get();
+        return userRepository.findById(id).orElse(null);
     }
 
     @Transactional
     public void delete(int id) {
-
+        if (getOneUser(id) == null) {
+            throw new EntityNotFoundException("User with this id not found");
+        }
         userRepository.deleteById(id);
     }
 
@@ -91,19 +88,7 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    public void saveAllUsers(List<User> users) {
-        for (User user : users) {
-            if (user.getPassword().length() != 60) {
-                user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
-            }
-        }
-        userRepository.saveAll(users);
 
-    }
-
-    public void deleteAllUsers(List<User> users) {
-        userRepository.deleteAll(users);
-    }
 
 
 }

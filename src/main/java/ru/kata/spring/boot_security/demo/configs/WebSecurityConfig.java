@@ -27,10 +27,11 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
+                .csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/api/admin/**").hasRole("ADMIN")
                 .antMatchers("/user").hasAnyRole("ADMIN", "USER")
-                .antMatchers("/", "/index").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .formLogin().successHandler(successUserHandler)
@@ -49,11 +50,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
         auth.userDetailsService(userService);
     }
-//    @Bean
-//    public PasswordEncoder getPasswordEncoder() {
-//
-//       return NoOpPasswordEncoder.getInstance();
-//    }
 
     @Bean
     public BCryptPasswordEncoder getPasswordEncoder() {

@@ -15,7 +15,7 @@ public interface UserService extends UserDetailsService {
 
     List<User> listAll();
 
-    User get(int id);
+    User getOneUser(int id);
 
     void delete(int id);
 
@@ -23,7 +23,4 @@ public interface UserService extends UserDetailsService {
 
     Optional<User> findByUsername(String username);
 
-    void saveAllUsers(List<User> users);
-
-    void deleteAllUsers(List<User> users);
 }
